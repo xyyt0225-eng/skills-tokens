@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦐 Skill 编写教程 - 杨小虾</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* 导航栏 */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            padding: 1rem 2rem;
+        }
+
+        nav .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        nav .logo span {
+            color: var(--accent);
+        }
+
+        nav .progress-info {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            width: 280px;
+            height: calc(100vh - 60px);
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 1.5rem 0;
+        }
+
+        .sidebar-section {
+            padding: 0 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-menu button {
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .sidebar-menu button:hover {
+            background: var(--bg-card-hover);
+            color: var(--text);
+        }
+
+        .sidebar-menu button.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .sidebar-menu button.lesson-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-menu button.lesson-btn .check {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .sidebar-menu button.lesson-btn.completed .check {
+            background: var(--secondary);
+            border-color: var(--secondary);
+        }
+
+        .sidebar-menu button.lesson-btn.current {
+            border-left: 3px solid var(--primary);
+        }
+
+        /* 主内容 */
+        main {
+            margin-left: 280px;
+            padding: 100px 3rem 3rem;
+            max-width: 900px;
+        }
+
+        /* 章节样式 */
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin: 2rem 0 1rem;
+            color: var(--text);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--text);
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .lead {
+            font-size: 1.125rem;
+            color: var(--text);
+            margin-bottom: 2rem;
+        }
+
+        /* 卡片 */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .card-item {
+            background: var(--bg);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .card-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .card-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-item h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-item p {
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        /* 代码块 */
+        pre {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.875rem;
+            color: #e2e8f0;
+        }
+
+        pre code {
+            display: block;
+            line-height: 1.5;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* 行内代码 */
+        p code, li code {
+            background: var(--bg);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            color: var(--accent);
+        }
+
+        /* 目录 */
+        .toc {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .toc-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .toc ol {
+            counter-reset: toc-counter;
+            list-style: none;
+        }
+
+        .toc li {
+            counter-increment: toc-counter;
+            margin-bottom: 0.5rem;
+        }
+
+        .toc li::before {
+            content: counter(toc-counter);
+            background: var(--primary);
+            color: white;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            margin-right: 0.75rem;
+        }
+
+        .toc a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .toc a:hover {
+            color: var(--primary);
+        }
+
+        /* 步骤 */
+        .steps {
+            counter-reset: step-counter;
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .steps li {
+            counter-increment: step-counter;
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-left: 3.5rem;
+        }
+
+        .steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .steps li::after {
+            content: '';
+            position: absolute;
+            left: 1.2rem;
+            top: 2.5rem;
+            width: 2px;
+            height: calc(100% - 1rem);
+            background: var(--border);
+        }
+
+        .steps li:last-child::after {
+            display: none;
+        }
+
+        .steps .step-content {
+            flex: 1;
+        }
+
+        .steps h4 {
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .steps p {
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        /* 标签 */
+        .tag {
+            display: inline-block;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 0.25rem;
+        }
+
+        .tag-blue { background: rgba(99, 102, 241, 0.2); color: var(--primary); }
+        .tag-green { background: rgba(16, 185, 129, 0.2); color: var(--secondary); }
+        .tag-amber { background: rgba(245, 158, 11, 0.2); color: var(--accent); }
+        .tag-red { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        /* 测验 */
+        .quiz {
+            background: var(--bg-card);
+            border: 2px solid var(--primary);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .quiz h3 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+
+        .quiz-options {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .quiz-options li {
+            margin-bottom: 0.5rem;
+        }
+
+        .quiz-options button {
+            width: 100%;
+            text-align: left;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quiz-options button:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .quiz-options button.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .quiz-options button.correct {
+            border-color: var(--secondary);
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .quiz-options button.incorrect {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .quiz-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: none;
+        }
+
+        .quiz-result.show {
+            display: block;
+        }
+
+        .quiz-result.correct {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--secondary);
+        }
+
+        .quiz-result.incorrect {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .nav-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            background: var(--border);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 交互图表 */
+        .flow-chart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 2rem 0;
+        }
+
+        .flow-node {
+            background: var(--bg-card);
+            border: 2px solid var(--primary);
+            border-radius: 1rem;
+            padding: 1rem 2rem;
+            text-align: center;
+            width: 200px;
+            transition: all 0.3s;
+        }
+
+        .flow-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .flow-node.highlight {
+            background: var(--primary);
+        }
+
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        /* 文件树 */
+        .file-tree {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .file-tree .folder {
+            color: var(--accent);
+        }
+
+        .file-tree .file {
+            color: var(--secondary);
+        }
+
+        .file-tree .indent {
+            padding-left: 1.5rem;
+        }
+
+        .file-tree .line {
+            padding: 0.125rem 0;
+        }
+
+        /* 完成徽章 */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: var(--secondary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* 提示框 */
+        .tip {
+            background: rgba(99, 102, 241, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+            margin: 1rem 0;
+        }
+
+        .tip-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tip p {
+            margin: 0;
+            font-size: 0.875rem;
+        }
+
+        .warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left-color: var(--accent);
+        }
+
+        .warning .tip-title {
+            color: var(--accent);
+        }
+
+        /* 弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+
+        .modal h3 {
+            margin-top: 0;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* 进阶/基础切换 */
+        .tab-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* 进度条 */
+        .progress-bar {
+            position: fixed;
+            top: 60px;
+            left: 280px;
+            right: 0;
+            height: 3px;
+            background: var(--border);
+            z-index: 99;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* 响应式 */
+        @media (max-width: 900px) {
+            .sidebar {
+                display: none;
+            }
+            main {
+                margin-left: 0;
+                padding: 100px 1.5rem 1.5rem;
+            }
+            .progress-bar {
+                left: 0;
+            }
+        }
+
+        /* 动画 */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* 互动表格 */
+        .interactive-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .interactive-table th,
+        .interactive-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .interactive-table th {
+            background: var(--bg);
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .interactive-table tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .interactive-table td:first-child {
+            color: var(--primary);
+            font-family: monospace;
+        }
+
+        /* 对比卡片 */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .compare-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .compare-card .emoji {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .compare-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* 实践区 */
+        .practice-area {
+            background: var(--bg-card);
+            border: 2px dashed var(--border);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .practice-area h3 {
+            color: var(--accent);
+        }
+
+        .practice-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.2s;
+        }
+
+        .practice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        /* 目录链接 */
+        .toc-link {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .toc-link:hover {
+            background: var(--bg-card-hover);
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav>
+        <div class="nav-content">
+            <div class="logo">🦐 杨小虾的 <span>Skill 编写教程</span></div>
+            <div class="progress-info">
+                <span id="progress-text">第 1 / 9 课</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 进度条 -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+    </div>
+
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-title">📖 课程目录</div>
+            <ul class="sidebar-menu">
+                <li>
+                    <button class="lesson-btn active" data-section="intro">
+                        <span class="check">✓</span>
+                        什么是 Skill？
+                    </button>
+                </li>
+                <li>
+                    <button class="lesson-btn" data-section="principle">
+                        <span class="check"></span>
+                        工作原理
+                    </button>
+                </li>
+                <li>
+                    <button class="lesson-btn" data-section="structure">
+                        <span class="check"></span>
+                        目录结构
+                    </button>
+                </li>
+                <li>
+                    <button class="lesson-btn" data-section="anatomy">
+                        <span class="check"></span>
+                        SKILL.md 详解
+                    </button>
+                </li>
+                <li>
+                    <button class="lesson-btn" data-section="resources">
+                        <span class="check"></span>
+                        资源文件
+                    </button>
+                </li>
+                <li>
+                    <button class="lesson-btn" data-section="process">
+                        <span class="check"></span>
+                        编写流程
+                    </button>
+                </li>
+                <li>
+                    <button class="lesson-btn" data-section="demo">
+                        <span class="check"></span>
+                        实战练习
+                    </button>
+                </li>
+                <li>
+                    <button class="lesson-btn" data-section="test">
+                        <span class="check"></span>
+                        章节测验
+                    </button>
+                </li>
+                <li>
+                    <button class="lesson-btn" data-section="final">
+                        <span class="check"></span>
+                        总结
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- 主内容 -->
+    <main>
+        <!-- 第1课：什么是Skill -->
+        <section id="intro" class="section active">
+            <h1>🦐 什么是 Skill？</h1>
+            <p class="lead">为 OpenClaw 编写的「能力扩展包」，让它在特定领域变得专业</p>
+
+            <div class="tip">
+                <div class="tip-title">💡 一句话理解</div>
+                <p>Skill = 告诉 OpenClaw「遇到这种情况时，应该怎么做」的说明书</p>
+            </div>
+
+            <h2>类比理解</h2>
+            <div class="card-grid">
+                <div class="card-item">
+                    <div class="icon">🏥</div>
+                    <h4>通用医生</h4>
+                    <p>普通感冒能看，但不够专业</p>
+                </div>
+                <div class="card-item">
+                    <div class="icon">⚡</div>
+                    <h4>专业科室</h4>
+                    <p>有了「骨科 Skill」，就能看复杂的骨折</p>
+                </div>
+                <div class="card-item">
+                    <div class="icon">🎯</div>
+                    <h4>精确匹配</h4>
+                    <p>用户一说症状，就知道该用什么 Skill</p>
+                </div>
+            </div>
+
+            <h2>真实例子</h2>
+            <div class="card">
+                <div class="card-title">🎨 一个「小红书文案 Skill」长这样</div>
+                <p>当用户说「帮我写个小红书推广文案」时...</p>
+                <pre><code>OpenClaw 看到关键词：「小红书」「文案」「推广」
+    ↓
+匹配到 wechat-copywriting Skill
+    ↓
+读取 Skill 里的专业指令，开始写作</code></pre>
+            </div>
+
+            <div class="practice-area">
+                <h3>🎯 思考一下</h3>
+                <p>你的工作中，有哪些重复性的任务想要自动化？</p>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.5rem;">
+                    比如：每次都要写固定格式的报告、分析数据、回复特定内容...
+                </p>
+            </div>
+
+            <div class="bottom-nav">
+                <button class="nav-btn" disabled>← 上一页</button>
+                <button class="nav-btn" onclick="goToSection('principle')">下一页 →</button>
+            </div>
+        </section>
+
+        <!-- 第2课：工作原理 -->
+        <section id="principle" class="section">
+            <h1>⚙️ Skill 的工作原理</h1>
+            <p class="lead">理解触发机制，才能写出精准的 Skill</p>
+
+            <h2>核心流程</h2>
+            <div class="flow-chart">
+                <div class="flow-node">
+                    <strong>用户请求</strong><br>
+                    <small>「帮我写公众号文案」</small>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight">
+                    <strong>OpenClaw 匹配</strong><br>
+                    <small>根据 description 判断用哪个 Skill</small>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node">
+                    <strong>加载 SKILL.md</strong><br>
+                    <small>读取指令和流程</small>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node">
+                    <strong>执行任务</strong><br>
+                    <small>按照 Skill 指引工作</small>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node">
+                    <strong>返回结果</strong><br>
+                    <small>完成用户的请求</small>
+                </div>
+            </div>
+
+            <div class="tip">
+                <div class="tip-title">🔑 关键点</div>
+                <p><code>description</code> 写得好不好，决定了 Skill 能不能被正确触发！</p>
+            </div>
+
+            <h2>渐进式加载（省 Token）</h2>
+            <div class="card">
+                <table class="interactive-table">
+                    <thead>
+                        <tr>
+                            <th>层级</th>
+                            <th>内容</th>
+                            <th>何时加载</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>name + description</td>
+                            <td>始终加载（~100字）</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>SKILL.md 正文</td>
+                            <td>Skill 被触发时（&lt;5k字）</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>references/scripts</td>
+                            <td>按需加载（不限量）</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>触发动画</h2>
+            <div class="card">
+                <div class="card-title">📝 假设用户说：</div>
+                <p style="font-size: 1.125rem; color: var(--primary);">「我的 PDF 文件怎么加水印？」</p>
+                <div style="margin-top: 1rem;">
+                    <p>OpenClaw 扫描所有 Skill 的 description：</p>
+                    <pre><code>Skill A: "处理图片编辑..." ❌ 不匹配
+Skill B: "当用户需要处理 PDF..." ✅ 匹配！
+    ↓
+加载 Skill B，执行 PDF 相关指令</code></pre>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <button class="nav-btn" onclick="goToSection('intro')">← 上一页</button>
+                <button class="nav-btn" onclick="goToSection('structure')">下一页 →</button>
+            </div>
+        </section>
+
+        <!-- 第3课：目录结构 -->
+        <section id="structure" class="section">
+            <h1>📁 Skill 的目录结构</h1>
+            <p class="lead">最简单只需要 1 个文件，复杂的有 4 个文件夹</p>
+
+            <h2>最小结构</h2>
+            <div class="file-tree">
+                <div class="line"><span class="folder">📂 my-first-skill/</span></div>
+                <div class="line indent"><span class="file">📄 SKILL.md</span> ← 必须有</div>
+            </div>
+
+            <h2>完整结构</h2>
+            <div class="file-tree">
+                <div class="line"><span class="folder">📂 skill-name/</span> <span style="color: var(--text-muted);">← 名字 = Skill 名字，全小写</span></div>
+                <div class="line indent"><span class="file">📄 SKILL.md</span> <span style="color: var(--text-muted);">← 必须：核心文件</span></div>
+                <div class="line indent"><span class="folder">📂 scripts/</span> <span style="color: var(--text-muted);">← 可选：可执行脚本</span></div>
+                <div class="line indent indent"><span class="file">📄 rotate_pdf.py</span></div>
+                <div class="line indent"><span class="folder">📂 references/</span> <span style="color: var(--text-muted);">← 可选：参考资料</span></div>
+                <div class="line indent indent"><span class="file">📄 api-docs.md</span></div>
+                <div class="line indent"><span class="folder">📂 assets/</span> <span style="color: var(--text-muted);">← 可选：资源文件</span></div>
+                <div class="line indent indent"><span class="file">📄 logo.png</span></div>
+            </div>
+
+            <h2>各文件夹作用</h2>
+            <div class="card-grid">
+                <div class="card-item">
+                    <div class="icon">📄</div>
+                    <h4>SKILL.md</h4>
+                    <p>核心指令、工作流程、触发条件</p>
+                </div>
+                <div class="card-item">
+                    <div class="icon">🔧</div>
+                    <h4>scripts/</h4>
+                    <p>重复性代码脚本，稳定可靠</p>
+                </div>
+                <div class="card-item">
+                    <div class="icon">📚</div>
+                    <h4>references/</h4>
+                    <p>详细文档，按需加载，不占空间</p>
+                </div>
+                <div class="card-item">
+                    <div class="icon">🎨</div>
+                    <h4>assets/</h4>
+                    <p>输出时用的模板、图片等</p>
+                </div>
+            </div>
+
+            <div class="tip warning">
+                <div class="tip-title">⚠️ 命名规范</div>
+                <p>文件夹名 = Skill 名，全小写，用 <code>-</code> 连接<br>
+                例如：<code>wechat-copywriting</code>、<code>pdf-editor</code></p>
+            </div>
+
+            <div class="bottom-nav">
+                <button class="nav-btn" onclick="goToSection('principle')">← 上一页</button>
+                <button class="nav-btn" onclick="goToSection('anatomy')">下一页 →</button>
+            </div>
+        </section>
+
+        <!-- 第4课：SKILL.md详解 -->
+        <section id="anatomy" class="section">
+            <h1>📝 SKILL.md 详解</h1>
+            <p class="lead">SKILL.md 是 Skill 的灵魂，分为两部分：元数据 + 正文</p>
+
+            <h2>Part 1：YAML Frontmatter（元数据）</h2>
+            <div class="card">
+                <div class="card-title">📋 必须包含的字段</div>
+                <pre><code>---
+name: skill的名称           # 英文小写+中划线
+description: 这段描述决定何时触发这个 Skill！
+            要写清楚：做什么 + 什么场景触发
+            越具体越好，OpenClaw 靠它匹配
+---</code></pre>
+            </div>
+
+            <div class="tip">
+                <div class="tip-title">💡 description 写法技巧</div>
+                <p>✅ 好：「当用户需要创建、编辑 Word 文档（.docx）时使用」<br>
+                ❌ 差：「处理文档」</p>
+            </div>
+
+            <h2>Part 2：Body（正文）</h2>
+            <div class="card">
+                <div class="card-title">📖 正文结构建议</div>
+                <pre><code># Skill 名称
+
+## 快速开始
+简要说明如何使用
+
+## 工作流程
+1. 第一步
+2. 第二步
+3. 第三步
+
+## 详细指南（按需）
+- 进阶内容 → 链接到 references/
+- 示例代码 → 直接写这里
+- 注意事项 → 容易出错的地方</code></pre>
+            </div>
+
+            <h2>一个完整例子</h2>
+            <pre><code>---
+name: wechat-copywriting
+description: 辅助公众号运营和推文撰写。当用户提到：
+              - 写公众号文章/推文/内容
+              - 公众号选题/标题/文案
+              - 微信图文消息
+              使用此 Skill。
+---
+
+# 公众号运营助手
+
+## 工作流程
+
+1. 了解账号定位和目标用户
+2. 确定内容方向和选题
+3. 撰写标题 + 正文
+4. 给出发布建议
+
+## 注意事项
+- 标题控制在14字以内
+- 开头要制造悬念或共鸣
+...</code></pre>
+
+            <div class="bottom-nav">
+                <button class="nav-btn" onclick="goToSection('structure')">← 上一页</button>
+                <button class="nav-btn" onclick="goToSection('resources')">下一页 →</button>
+            </div>
+        </section>
+
+        <!-- 第5课：资源文件 -->
+        <section id="resources" class="section">
+            <h1>📦 Bundled Resources</h1>
+            <p class="lead">可选的资源文件夹，让 Skill 更强大</p>
+
+            <h2>scripts/ - 可执行脚本</h2>
+            <div class="compare-grid">
+                <div class="compare-card">
+                    <div class="emoji">🤖</div>
+                    <h4>适用场景</h4>
+                    <p>重复性、稳定可靠的代码<br>比如：PDF旋转、图片处理</p>
+                </div>
+                <div class="compare-card">
+                    <div class="emoji">✨</div>
+                    <h4>优势</h4>
+                    <p>不占 token<br>执行结果稳定<br>可反复使用</p>
+                </div>
+            </div>
+
+            <h2>references/ - 参考文档</h2>
+            <div class="card">
+                <div class="card-title">📚 使用方式</div>
+                <p>详细内容不放 SKILL.md，放到这里</p>
+                <pre><code># SKILL.md（简洁版）
+See [API文档](references/api.md) for details.
+
+# references/api.md（详细内容）
+# API 完整文档...</code></pre>
+            </div>
+
+            <h2>assets/ - 资源文件</h2>
+            <div class="card-grid">
+                <div class="card-item">
+                    <div class="icon">📝</div>
+                    <h4>模板文件</h4>
+                    <p>报告模板、邮件模板</p>
+                </div>
+                <div class="card-item">
+                    <div class="icon">🎨</div>
+                    <h4>品牌素材</h4>
+                    <p>Logo、图片、图标</p>
+                </div>
+                <div class="card-item">
+                    <div class="icon">📦</div>
+                    <h4>项目模板</h4>
+                    <p>React/HTML 脚手架</p>
+                </div>
+            </div>
+
+            <div class="tip">
+                <div class="tip-title">📌 什么时候用？</div>
+                <p>
+                    <span class="tag tag-blue">scripts</span> 代码要稳定重复运行<br>
+                    <span class="tag tag-green">references</span> 内容多、详细、不每次都要看<br>
+                    <span class="tag tag-amber">assets</span> 输出时要引用文件
+                </p>
+            </div>
+
+            <div class="bottom-nav">
+                <button class="nav-btn" onclick="goToSection('anatomy')">← 上一页</button>
+                <button class="nav-btn" onclick="goToSection('process')">下一页 →</button>
+            </div>
+        </section>
+
+        <!-- 第6课：编写流程 -->
+        <section id="process" class="section">
+            <h1>🔄 编写流程 6 步法</h1>
+            <p class="lead">从需求到打包，手把手教你写 Skill</p>
+
+            <ol class="steps">
+                <li>
+                    <div class="step-content">
+                        <h4>理解需求</h4>
+                        <p>这个 Skill 要解决什么问题？用户会怎么说？</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="step-content">
+                        <h4>规划内容</h4>
+                        <p>需要哪些 scripts / references / assets？</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="step-content">
+                        <h4>初始化</h4>
+                        <p>用 init_skill.py 生成模板</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="step-content">
+                        <h4>编辑实现</h4>
+                        <p>写 SKILL.md 和资源文件</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="step-content">
+                        <h4>打包</h4>
+                        <p>用 package_skill.py 打包成 .skill 文件</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="step-content">
+                        <h4>测试迭代</h4>
+                        <p>实际使用，发现问题继续改进</p>
+                    </div>
+                </li>
+            </ol>
+
+            <h2>Step 3 初始化命令</h2>
+            <pre><code>scripts/init_skill.py &lt;skill-name&gt; --path &lt;output-path&gt; [--resources scripts,references,assets]</code></pre>
+
+            <h2>Step 5 打包命令</h2>
+            <pre><code>scripts/package_skill.py &lt;path/to/skill-folder&gt;</code></pre>
+
+            <div class="bottom-nav">
+                <button class="nav-btn" onclick="goToSection('resources')">← 上一页</button>
+                <button class="nav-btn" onclick="goToSection('demo')">下一页 →</button>
+            </div>
+        </section>
+
+        <!-- 第7课：实战练习 -->
+        <section id="demo" class="section">
+            <h1>🚀 实战练习</h1>
+            <p class="lead">为老大写一个「公众号助手」Skill</p>
+
+            <h2>需求分析</h2>
+            <div class="card">
+                <div class="card-title">📋 需求清单</div>
+                <ul style="list-style: disc; padding-left: 1.5rem; color: var(--text-muted);">
+                    <li>辅助运营两个公众号</li>
+                    <li>写推文、做选题</li>
+                    <li>分析数据</li>
+                    <li>回复粉丝</li>
+                </ul>
+            </div>
+
+            <h2>目录结构设计</h2>
+            <div class="file-tree">
+                <div class="line"><span class="folder">📂 wechat-ops/</span></div>
+                <div class="line indent"><span class="file">📄 SKILL.md</span></div>
+                <div class="line indent"><span class="folder">📂 references/</span></div>
+                <div class="line indent indent"><span class="file">📄 content-types.md</span> <span style="color: var(--text-muted);">内容类型指南</span></div>
+                <div class="line indent indent"><span class="file">📄 title-templates.md</span> <span style="color: var(--text-muted);">标题模板库</span></div>
+            </div>
+
+            <h2>SKILL.md 代码</h2>
+            <pre><code>---
+name: wechat-ops
+description: 辅助公众号运营。当用户提到：
+              - 写公众号/推文/文章
+              - 公众号选题/标题/内容
+              - 微信运营/涨粉/互动
+              使用此 Skill。
+---
+
+# 公众号运营助手
+
+## 工作流程
+
+1. **确认需求**
+   - 账号定位是什么？
+   - 目标用户是谁？
+   - 这次要发什么类型的内容？
+
+2. **内容规划**
+   - 选题方向
+   - 内容类型（干货/故事/热点/产品）
+   - 参考：[references/content-types.md](references/content-types.md)
+
+3. **撰写内容**
+   - 标题：吸引点击，≤14字
+   - 开头：制造悬念或共鸣
+   - 正文：逻辑清晰，适当分段
+   - 结尾：引导互动
+
+4. **发布建议**
+   - 最佳发布时间
+   - 标签选择
+   - 推广策略
+
+## 标题模板
+
+参考：[references/title-templates.md](references/title-templates.md)</code></pre>
+
+            <div class="practice-area">
+                <h3>✍️ 你的任务</h3>
+                <p>尝试修改这个 Skill，加入你工作中需要的元素</p>
+                <button class="practice-btn" onclick="showPracticeTip()">获取提示</button>
+            </div>
+
+            <div class="bottom-nav">
+                <button class="nav-btn" onclick="goToSection('process')">← 上一页</button>
+                <button class="nav-btn" onclick="goToSection('test')">下一页 →</button>
+            </div>
+        </section>
+
+        <!-- 第8课：章节测验 -->
+        <section id="test" class="section">
+            <h1>📝 章节测验</h1>
+            <p class="lead">来测试一下学得怎么样！</p>
+
+            <div class="quiz" id="quiz1">
+                <h3>测验 1：Skill 的核心触发机制是什么？</h3>
+                <ul class="quiz-options">
+                    <li><button onclick="checkAnswer(this, false)">A. 文件名</button></li>
+                    <li><button onclick="checkAnswer(this, true)">B. description 描述</button></li>
+                    <li><button onclick="checkAnswer(this, false)">C. SKILL.md 的标题</button></li>
+                    <li><button onclick="checkAnswer(this, false)">D. scripts 文件夹</button></li>
+                </ul>
+                <div class="quiz-result"></div>
+            </div>
+
+            <div class="quiz" id="quiz2">
+                <h3>测验 2：哪个是必须的文件？</h3>
+                <ul class="quiz-options">
+                    <li><button onclick="checkAnswer(this, false)">A. scripts/</button></li>
+                    <li><button onclick="checkAnswer(this, true)">B. SKILL.md</button></li>
+                    <li><button onclick="checkAnswer(this, false)">C. references/</button></li>
+                    <li><button onclick="checkAnswer(this, false)">D. assets/</button></li>
+                </ul>
+                <div class="quiz-result"></div>
+            </div>
+
+            <div class="quiz" id="quiz3">
+                <h3>测验 3：description 应该怎么写？</h3>
+                <ul class="quiz-options">
+                    <li><button onclick="checkAnswer(this, false)">A. 越详细越好，把所有功能都写上</button></li>
+                    <li><button onclick="checkAnswer(this, true)">B. 写清楚做什么 + 什么场景触发</button></li>
+                    <li><button onclick="checkAnswer(this, false)">C. 越短越好，只写关键词</button></li>
+                    <li><button onclick="checkAnswer(this, false)">D. 不重要，随便写</button></li>
+                </ul>
+                <div class="quiz-result"></div>
+            </div>
+
+            <div class="bottom-nav">
+                <button class="nav-btn" onclick="goToSection('demo')">← 上一页</button>
+                <button class="nav-btn" onclick="goToSection('final')">下一页 →</button>
+            </div>
+        </section>
+
+        <!-- 第9课：总结 -->
+        <section id="final" class="section">
+            <h1>🎉 恭喜完成！</h1>
+            <p class="lead">你已经掌握了 Skill 编写的核心知识</p>
+
+            <div class="card">
+                <div class="card-title">📋 学习成果</div>
+                <div class="card-grid">
+                    <div class="card-item">
+                        <div class="icon">✅</div>
+                        <h4>理解原理</h4>
+                        <p>知道 Skill 如何触发和加载</p>
+                    </div>
+                    <div class="card-item">
+                        <div class="icon">✅</div>
+                        <h4>掌握结构</h4>
+                        <p>SKILL.md + 可选资源</p>
+                    </div>
+                    <div class="card-item">
+                        <div class="icon">✅</div>
+                        <h4>会写 description</h4>
+                        <p>精准触发的关键</p>
+                    </div>
+                    <div class="card-item">
+                        <div class="icon">✅</div>
+                        <h4>了解流程</h4>
+                        <p>6 步编写法</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2>核心要点回顾</h2>
+            <div class="card">
+                <pre><code>Skill = name + description（触发）+ SKILL.md（执行）
+
+目录结构：
+skill-name/
+├── SKILL.md          ← 必须
+├── scripts/          ← 可选
+├── references/       ← 可选
+└── assets/           ← 可选
+
+编写流程：
+理解需求 → 规划内容 → 初始化 → 编写 → 打包 → 测试</code></pre>
+            </div>
+
+            <div class="tip">
+                <div class="tip-title">🚀 下一步</div>
+                <p>试着写一个你自己的 Skill吧！遇到问题随时来问我 🦐</p>
+            </div>
+
+            <div class="practice-area" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(16, 185, 129, 0.1));">
+                <h3>🎯 课后作业</h3>
+                <p>想一个你工作中重复性的任务，写一个简单的 Skill 来处理它</p>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.5rem;">
+                    写完可以发给我，我帮你 review 🦐
+                </p>
+            </div>
+
+            <div class="bottom-nav">
+                <button class="nav-btn" onclick="goToSection('test')">← 上一页</button>
+                <button class="nav-btn" disabled>完成 ✅</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- 弹窗 -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h3>💡 提示</h3>
+            <p id="modal-content"></p>
+            <button class="nav-btn" onclick="closeModal()" style="margin-top: 1rem;">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        // 当前章节索引
+        const sections = ['intro', 'principle', 'structure', 'anatomy', 'resources', 'process', 'demo', 'test', 'final'];
+        let currentIndex = 0;
+
+        // 章节完成状态
+        const completed = {};
+
+        // 切换章节
+        function goToSection(sectionId) {
+            // 更新侧边栏
+            document.querySelectorAll('.lesson-btn').forEach(btn => {
+                btn.classList.remove('active', 'current');
+                if (btn.dataset.section === sectionId) {
+                    btn.classList.add('active', 'current');
+                }
+            });
+
+            // 显示对应内容
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+
+            // 更新进度
+            currentIndex = sections.indexOf(sectionId);
+            updateProgress();
+
+            // 标记为完成
+            completed[sectionId] = true;
+            updateSidebar();
+        }
+
+        // 更新进度条
+        function updateProgress() {
+            const progress = ((currentIndex + 1) / sections.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = `第 ${currentIndex + 1} / ${sections.length} 课`;
+        }
+
+        // 更新侧边栏完成状态
+        function updateSidebar() {
+            document.querySelectorAll('.lesson-btn').forEach(btn => {
+                const section = btn.dataset.section;
+                if (completed[section]) {
+                    btn.classList.add('completed');
+                    btn.querySelector('.check').textContent = '✓';
+                }
+            });
+        }
+
+        // 侧边栏点击
+        document.querySelectorAll('.lesson-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                goToSection(btn.dataset.section);
+            });
+        });
+
+        // 测验答案检查
+        function checkAnswer(button, isCorrect) {
+            const quiz = button.closest('.quiz');
+            const options = quiz.querySelectorAll('.quiz-options button');
+            const result = quiz.querySelector('.quiz-result');
+
+            // 禁用所有选项
+            options.forEach(opt => {
+                opt.disabled = true;
+                if (opt === button) {
+                    opt.classList.add(isCorrect ? 'correct' : 'incorrect');
+                }
+            });
+
+            // 显示结果
+            result.classList.add('show');
+            if (isCorrect) {
+                result.classList.add('correct');
+                result.textContent = '🎉 正确！';
+            } else {
+                result.classList.add('incorrect');
+                result.textContent = '❌ 不对，再想想~';
+                // 找出正确答案
+                options.forEach(opt => {
+                    if (opt !== button) {
+                        // 找正确的选项并标记
+                    }
+                });
+            }
+        }
+
+        // 显示提示
+        function showPracticeTip() {
+            document.getElementById('modal-content').innerHTML = `
+                <p>💡 <strong>提示：</strong></p>
+                <ul style="margin-top: 0.5rem; text-align: left;">
+                    <li>想想老大运营公众号时最费时间的环节是什么？</li>
+                    <li>可以在 references/ 里加什么实用资料？</li>
+                    <li>有没有需要自动化的重复操作？</li>
+                </ul>
+            `;
+            document.getElementById('modal').classList.add('show');
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        // 点击弹窗外部关闭
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') {
+                closeModal();
+            }
+        });
+
+        // 初始化进度
+        updateProgress();
+    </script>
+</body>
+</html>
